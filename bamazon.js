@@ -1,4 +1,11 @@
-/* bamazon.js */
+// ===========================================================================================
+//
+//  File name: bamazon.js
+//  Description:
+//  Date: April, 2018
+//  Author: Fabian Flores
+//
+// ===========================================================================================
 
 var mysql = require("mysql");
 var inquirer = require("inquirer");
