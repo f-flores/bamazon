@@ -37,10 +37,7 @@ var connection = mysql.createConnection({
 	//
 	function connectToDatabase() {
 		connection.connect(function(err) {
-			if (err) {
-				throw err;
-			}
-		//	console.log("connected as id " + connection.threadId + "\n");
+			if (err) throw err;
 		});
 		function beginApp() {
 			startBamazon();
@@ -97,78 +94,129 @@ var connection = mysql.createConnection({
 				product.price.toFixed(PRICE_DECIMAL).toString().replace(/^/,"$").padStart(PAD_PRICE)) ;
 			}
 			console.log("======================================================".bold.blue);
-			startBamazon();
+			getPurchaseOptions();
+			// startBamazon();
 		});
 		// console.log(query.sql);
 	}
 
-	function bid() {
-		console.log("selecting all items");
-		connection.query("SELECT item_name, category FROM auctions", function(err, res) {
-			if (err) throw err;
+	// ------------------------------------------------------------------------------------------
+	// getPurchaseOptions() The first should ask them the ID of the product they would like to buy.
+	// The second message should ask how many units of the product they would like to buy.
+	//
+	function getPurchaseOptions() {
+		var purchaseItem = {
+			idProduct: 0, 
+			numProducts: 0,
+			productName: "",
+			productQty: 0
+		};
+				
+		/* get total number of ids */
+		function getNumProducts() {
+			connection.query("SELECT COUNT(item_id) AS total_items, item_id FROM products", function(err, res) {
+				if (err) throw err;
+				purchaseItem.numProducts =  res[0].total_items;
+			});
+		}
 
-			function getChoices() {
-				var choices = [];
-				for (const item of res) {
-					choices.push(item.item_name);
-				}
-
-				return choices;
-			}
-
-			inquirer.prompt([
-				{
-					type: "list",
-					name: "bidChoice",
-					message: "Please choose one",
-					choices: getChoices()
-				} 
-			]).then(function(data) {
-				console.log("You picked " + data.bidChoice);
-				// How much they would like to bid...
-				getBid(data.bidChoice);
-			}
-			);
-		});
-	}
-
-	function getBid(itemChosen) {
-		console.log("Item chosen: " + itemChosen);
+		getNumProducts();
 		inquirer.prompt([
 			{
 				type: "input",
-				name: "bidPrice",
-				message: "How much are you bidding on " + itemChosen + "?",
+				name: "idProduct",
+				message: "What is the id of the product you would like to buy?",
 				validate: function(value) {
-					var price = parseFloat(value);
-					if (!isNaN(price) && price > 0) {
+					var msgText = "";
+
+					if (value > 0 && value <= purchaseItem.numProducts) {
 						return true;
 					} else {
-						return "Invalid input. Please enter bidding price greater than 0.";
+						msgText = "Invalid input. Please enter valid product id. ";
+						msgText += "Valid values between 1 and " + purchaseItem.numProducts.toString();
+						return msgText.bold.red;
+					}
+				}
+			}
+			/* 			{
+				type: "input",
+				name: "unitsProduct",
+				message: "How many units of the product you would like to buy?",
+				validate: function(value) {
+					var msgText = "";,
+
+					if (value > 0 && value <= numProducts) {
+						return true;
+					} else {
+						msgText = "Invalid input. Please enter valid product id. ";
+						msgText += "Valid values between 1 and " + numProducts.toString();
+						return msgText.bold.red;
+					}
+				}
+			}  */
+		]).then(function(data) {
+			/* retrieves product name and stock quantity of current item id */
+			function getProductName() {
+				var query = "SELECT product_name, stock_quantity FROM products WHERE ?";
+				connection.query(query, { item_id: data.idProduct }, function(err, res) {
+					if (err) throw err;
+					// console.log(res);
+					// console.log(res[0].product_name);
+					// console.log(res[0].stock_quantity);
+					purchaseItem.idProduct = data.idProduct;
+					purchaseItem.productName =  res[0].product_name;
+					purchaseItem.productQty = res[0].stock_quantity;
+					// console.log("purchaseItem: " + JSON.stringify(purchaseItem));
+					promptPurchaseQty(purchaseItem);
+				});
+			}
+			getProductName();
+
+		});
+	}
+
+	// ------------------------------------------------------------------------------------------
+	// promptPurchaseQty() asks the user how many were chosen and the quantity the user wishes
+	//	to purchase of that item
+	//
+	function promptPurchaseQty(product) {
+		console.log("Product chosen: " + JSON.stringify(product));
+
+		inquirer.prompt([
+			{
+				type: "input",
+				name: "qty",
+				message: "How many " + product.productName + "(s) would you like to purchase?",
+				validate: function(value) {
+					if (!isNaN(value) && value > 0 && value <= product.productQty) {
+						return true;
+					} else {
+							if (value !== 0) {
+								return "Insufficient quantity in stock. Please enter quantity between 1 and " + product.productQty;
+							}
 					}
 				}
 			}
 		]).then(function(answer) {
-			var query, qStatement = "SELECT starting_bid, highest_bid FROM auctions WHERE item_name = " + connection.escape(itemChosen) + ";";
-			console.log("You bid $" + answer.bidPrice + ".");
-			query = connection.query(qStatement, function(err, res) {
-				if (err) throw err;
+			var query =     "UPDATE products SET ? WHERE ?";
+			var newQty = product.productQty - answer.qty;
+			connection.query(query,
+				[
+					{
+						stock_quantity: newQty
+					},
+					{
+						item_id: product.idProduct
+					}
+				], function(err, res) {
+					// console.log("You chose" + answer.qty + ".");
+					console.log(res.affectedRows + " products updated!\n");
+					if (err) throw err;
 
-				if (res[0].starting_bid === 0) {
-				// update starting_bid to answer.bidPrice
-					updateStartBid(answer.bidPrice, itemChosen);
-				}
-				if (answer.bidPrice > res[0].highest_bid) {
-				// update highest_bid to answer.bidPrice
-					updateHighestBid(answer.bidPrice, itemChosen);
-				} else {
-					console.log("Sorry, your bid is to low. Please try again.");
 					startBamazon();
 				}
-			}
 			);
-			// startApp();
-			console.log(query.sql);
+			
 		});
 	}
 
