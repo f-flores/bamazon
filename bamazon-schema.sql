@@ -34,10 +34,3 @@ VALUE("white v-neck t-shirt", "clothing", 4.99, 100);
 
 INSERT INTO products (product_name, department_name, price, stock_quantity)
 VALUE("desk chair", "office furniture", 65.00, 10);
-
--- INSERT INTO my_songs (title, artist, genre)
--- VALUES 
--- ("Aqui el que baila gana", "Los Van Van", "salsa"),
--- ("The Wall", "Pink Floyd", "rock"),
--- ("Hello", "Adele", "pop"),
--- ("The Sign", "Ace the Base", "pop");
