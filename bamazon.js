@@ -139,36 +139,16 @@ var connection = mysql.createConnection({
 					}
 				}
 			}
-			/* 			{
-				type: "input",
-				name: "unitsProduct",
-				message: "How many units of the product you would like to buy?",
-				validate: function(value) {
-					var msgText = "";,
-
-					if (value > 0 && value <= numProducts) {
-						return true;
-					} else {
-						msgText = "Invalid input. Please enter valid product id. ";
-						msgText += "Valid values between 1 and " + numProducts.toString();
-						return msgText.bold.red;
-					}
-				}
-			}  */
 		]).then(function(data) {
 			/* retrieves product name and stock quantity of current item id */
 			function getProductName() {
 				var query = "SELECT product_name, stock_quantity, price FROM products WHERE ?";
 				connection.query(query, { item_id: data.idProduct }, function(err, res) {
 					if (err) throw err;
-					// console.log(res);
-					// console.log(res[0].product_name);
-					// console.log(res[0].stock_quantity);
 					purchaseItem.idProduct = data.idProduct;
 					purchaseItem.productPrice = res[0].price,
 					purchaseItem.productName =  res[0].product_name;
 					purchaseItem.productQty = res[0].stock_quantity;
-					// console.log("purchaseItem: " + JSON.stringify(purchaseItem));
 					promptPurchaseQty(purchaseItem);
 				});
 			}
@@ -190,11 +170,13 @@ var connection = mysql.createConnection({
 				name: "qty",
 				message: "How many " + product.productName + "(s) would you like to purchase?",
 				validate: function(value) {
-					if (!isNaN(value) && value > 0 && value <= product.productQty) {
+					var msgText = "";
+					if (!isNaN(value) && value >= 0 && value <= product.productQty) {
 						return true;
 					} else {
 						if (value !== 0) {
-							return "Insufficient quantity in stock. Please enter quantity between 1 and " + product.productQty;
+							msgText = "Insufficient quantity in stock. Please enter quantity between 1 and " + product.productQty;
+							return msgText.bold.red;
 						}
 					}
 				}
@@ -214,10 +196,15 @@ var connection = mysql.createConnection({
 					var msgText = "";
 					console.log(res.affectedRows + " products updated!\n");
 					if (err) throw err;
-					msgText = "You have purchased " + answer.qty + " " +
-							product.productName + "(s).\n";
-					msgText += "Purchase total: " + (answer.qty * product.productPrice) + ".\n";
-					console.log(msgText.bold.blue);					
+					if (answer.qty > 0) {
+						msgText = "You have purchased " + answer.qty + " " +
+								product.productName + "(s).\n";
+						msgText += "Purchase total: $" + (answer.qty * product.productPrice) + ".\n";
+
+					} else {
+						msgText = "You decided to purchase 0 " + product.productName + "s. Continuing with bamazon...\n";
+					}
+					console.log(msgText.bold.blue);
 
 					startBamazon();
 				}
