@@ -106,7 +106,8 @@ var connection = mysql.createConnection({
 	//
 	function getPurchaseOptions() {
 		var purchaseItem = {
-			idProduct: 0, 
+			idProduct: 0,
+			productPrice: 0, 
 			numProducts: 0,
 			productName: "",
 			productQty: 0
@@ -157,13 +158,14 @@ var connection = mysql.createConnection({
 		]).then(function(data) {
 			/* retrieves product name and stock quantity of current item id */
 			function getProductName() {
-				var query = "SELECT product_name, stock_quantity FROM products WHERE ?";
+				var query = "SELECT product_name, stock_quantity, price FROM products WHERE ?";
 				connection.query(query, { item_id: data.idProduct }, function(err, res) {
 					if (err) throw err;
 					// console.log(res);
 					// console.log(res[0].product_name);
 					// console.log(res[0].stock_quantity);
 					purchaseItem.idProduct = data.idProduct;
+					purchaseItem.productPrice = res[0].price,
 					purchaseItem.productName =  res[0].product_name;
 					purchaseItem.productQty = res[0].stock_quantity;
 					// console.log("purchaseItem: " + JSON.stringify(purchaseItem));
@@ -191,9 +193,9 @@ var connection = mysql.createConnection({
 					if (!isNaN(value) && value > 0 && value <= product.productQty) {
 						return true;
 					} else {
-							if (value !== 0) {
-								return "Insufficient quantity in stock. Please enter quantity between 1 and " + product.productQty;
-							}
+						if (value !== 0) {
+							return "Insufficient quantity in stock. Please enter quantity between 1 and " + product.productQty;
+						}
 					}
 				}
 			}
@@ -209,9 +211,13 @@ var connection = mysql.createConnection({
 						item_id: product.idProduct
 					}
 				], function(err, res) {
-					// console.log("You chose" + answer.qty + ".");
+					var msgText = "";
 					console.log(res.affectedRows + " products updated!\n");
 					if (err) throw err;
+					msgText = "You have purchased " + answer.qty + " " +
+							product.productName + "(s).\n";
+					msgText += "Purchase total: " + (answer.qty * product.productPrice) + ".\n";
+					console.log(msgText.bold.blue);					
 
 					startBamazon();
 				}
@@ -233,7 +239,8 @@ var connection = mysql.createConnection({
 				}
 			],
 			function(err, res) {
-				console.log(res.affectedRows + " item updated!\n");
+				console.log("successfully purchased!\n");
+				// console.log("You have purchased " + pro)
 			// Call deleteProduct AFTER the UPDATE completes
 			// deleteProduct();
 			}
