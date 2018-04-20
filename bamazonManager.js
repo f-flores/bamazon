@@ -39,30 +39,40 @@ var connection = mysql.createConnection({
 		connection.connect(function(err) {
 			if (err) throw err;
 		});
-		function beginApp() {
-			startBamazon();
+		function beginMgr() {
+			startBamMgr();
 		}
-		return beginApp;
+		return beginMgr;
 	}
 
-	var startBamazon = function () {
+	var startBamMgr = function () {
 		inquirer.prompt([
 
 			{
 				type: "list",
 				name: "userChoice",
 				message: "Please choose one",
-				choices: [ "DISPLAY ALL ITEMS", "EXIT BAMAZON"]
+				choices: [ "VIEW PRODUCTS FOR SALE", "VIEW LOW INVENTORY", "ADD TO INVENTORY", 
+					"ADD TO PRODUCT", "EXIT BAMAZON"]
 			}
 
 		// After the prompt, store the user's response in a variable called location.
 		]).then(function(answer) {
 			switch(answer.userChoice) {
-			case "DISPLAY ALL ITEMS":
-				displayItems();
+			case "VIEW PRODUCTS FOR SALE":
+				viewProductsForSale();
+				break;
+			case "VIEW LOW INVENTORY":
+				viewLowInventory();
+				break;
+			case "ADD TO INVENTORY":
+				addToInventory();
+				break;
+			case "ADD TO PRODUCT":
+				addToProduct();
 				break;
 			case "EXIT BAMAZON":
-				console.log("Leaving bamazon... Please come back soon".green);
+				console.log("Leaving bamazon Manager... Thank you!".green);
 				connection.end();
 				break;
 			default:
@@ -73,10 +83,29 @@ var connection = mysql.createConnection({
 
 	};
 
+	function viewProductsForSale() {
+		console.log("view products for sale");
+		startBamMgr();
+	}
+
+	function viewLowInventory() {
+		console.log("view low inventory");
+		startBamMgr();
+	}
+
+	function addToInventory() {
+		console.log("add to inventory");
+		startBamMgr();
+	}
+
+	function addToProduct() {
+		console.log("add to product");
+		startBamMgr();
+	}
 	// ------------------------------------------------------------------------------------------
 	// displayItems() shows all the items, including ids, names, and prices of products for sale
 	//
-	function displayItems() {
+	/* 	function displayItems() {
 		var query;
 	
 		console.log("ITEM ID".padStart(PAD_ITEM_ID).bold.yellow +
@@ -85,8 +114,6 @@ var connection = mysql.createConnection({
 		console.log("=======================================================".bold.blue);
 		query = 
 		connection.query("SELECT item_id, product_name, price FROM products", function(err, res) {
-			if (err) throw err;
-	
 			for (const product of res) {
 				console.log(
 					product.item_id.toString().padStart(PAD_ITEM_ID) + " | " + 
@@ -98,22 +125,22 @@ var connection = mysql.createConnection({
 			getPurchaseOptions();
 		});
 	}
-
+ */
 	// ------------------------------------------------------------------------------------------
 	// getPurchaseOptions() The first should ask them the ID of the product they would like to buy.
 	// The second message should ask how many units of the product they would like to buy.
 	//
-	function getPurchaseOptions() {
+	/* 	function getPurchaseOptions() {
 		var purchaseItem = {
 			idProduct: 0,
 			productPrice: 0, 
 			numProducts: 0,
 			productName: "",
 			productQty: 0
-		};
+		}; */
 				
 		/* get total number of ids */
-		function getNumProducts() {
+	/* 		function getNumProducts() {
 			connection.query("SELECT COUNT(item_id) AS total_items, item_id FROM products", function(err, res) {
 				if (err) throw err;
 				purchaseItem.numProducts =  res[0].total_items;
@@ -138,9 +165,9 @@ var connection = mysql.createConnection({
 					}
 				}
 			}
-		]).then(function(data) {
-			/* retrieves product name and stock quantity of current item id */
-			function getProductName() {
+		]).then(function(data) { */
+	/* retrieves product name and stock quantity of current item id */
+	/* 			function getProductName() {
 				var query = "SELECT product_name, stock_quantity, price FROM products WHERE ?";
 				connection.query(query, { item_id: data.idProduct }, function(err, res) {
 					if (err) throw err;
@@ -154,12 +181,14 @@ var connection = mysql.createConnection({
 			getProductName();
 		});
 	}
-
+ */
 	// ------------------------------------------------------------------------------------------
 	// promptPurchaseQty() asks the user how many were chosen and the quantity the user wishes
 	//	to purchase of that item
 	//
-	function promptPurchaseQty(product) {
+	/* 	function promptPurchaseQty(product) {
+		console.log("Product chosen: " + JSON.stringify(product));
+
 		inquirer.prompt([
 			{
 				type: "input",
@@ -207,8 +236,60 @@ var connection = mysql.createConnection({
 			);			
 		});
 	}
+ */
+	/* 	function updateStartBid(bid, item) {
+		console.log("Updating starting bid...\n");
+		var query = connection.query(
+			"UPDATE auctions SET ? WHERE ?",
+			[
+				{
+					starting_bid: bid
+				},
+				{
+					item_name: item
+				}
+			],
+			function(err, res) {
+				console.log("successfully purchased!\n");
+				// console.log("You have purchased " + pro)
+			// Call deleteProduct AFTER the UPDATE completes
+			// deleteProduct();
+			}
+		);
 
-	var startBamazonApp = connectToDatabase();
+		// logs the actual query being run
+		console.log(query.sql);
+	}
 
-	startBamazonApp();
+	function updateHighestBid(bid, item) {
+		var query = connection.query(
+			"UPDATE auctions SET ? WHERE ?",
+			[
+				{
+					highest_bid: bid
+				},
+				{
+					item_name: item
+				}
+			],
+			function(err, res) {
+				console.log(res.affectedRows + " item updated!\n");
+				console.log("You are now the highest bidder!...\n");
+				startBamazon();
+			}
+		);
+
+		// logs the actual query being run
+		console.log(query.sql);
+	// startApp();
+	}
+ */
+	// if (connectToDatabase()) {
+	// start app
+	//	startBamazon();
+	// }
+	var startBamazonMgr = connectToDatabase();
+
+	startBamazonMgr();
+
 })();
