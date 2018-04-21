@@ -71,7 +71,7 @@ var connection = mysql.createConnection({
 				addToInventory();
 				break;
 			case "ADD TO PRODUCT":
-				addToProduct();
+				addProduct();
 				break;
 			case "EXIT BAMAZON":
 				console.log("Leaving bamazon Manager... Thank you!".green);
@@ -199,9 +199,71 @@ var connection = mysql.createConnection({
 	//	});
 	}
 
-	function addToProduct() {
-		console.log("add to product");
-		startBamMgr();
+	function addProduct() {
+		inquirer.prompt([
+			{
+				name: "product",
+				type: "input",
+				message: "What is the product you would like to add?"
+			},
+			{
+				name: "price",
+				type: "input",
+				message: "What is the price of the product?",
+				validate: function(value) {
+					var msgText ="";
+
+					if (isNaN(value) === false && value > 0) {
+						return true;
+					}
+					msgText = "\nPlease enter a valid price.";
+					console.log(msgText.bold.red);
+					return false;
+				}
+			},
+			{
+				name: "dept",
+				type: "input",
+				message: "In what department does the product belong?"
+			},
+			{
+				name: "qty",
+				type: "input",
+				message: "How many are you placing into stock?",
+				validate: function(value) {
+					var msgText = "";
+	
+					if (isNaN(value) === false && value > 0) {
+						return true;
+					}
+					msgText = "\nPlease enter a valid quantity.";
+					console.log(msgText.bold.red);
+					return false;
+				}
+			}
+		]).then(function(answer) {
+			// when finished prompting, insert a new item into the db with that info
+			connection.query(
+				"INSERT INTO products SET ?",
+				{
+					product_name: answer.product,
+					department_name: answer.dept,
+					price: answer.price,
+					stock_quantity: answer.qty
+				},
+				function(err, res) {
+					var outputTxt = "";
+		
+					if (err) throw err;
+					outputTxt = answer.product + " added successfully!";
+					outputTxt += res.affectedRows + " rows added.";
+					console.log(outputTxt.blue);
+
+					startBamMgr();
+				}
+			);
+		});
+
 	}
 
 	var startBamazonMgr = connectToDatabase();
@@ -209,3 +271,53 @@ var connection = mysql.createConnection({
 	startBamazonMgr();
 
 })();
+
+// to add completely new product;;;;
+
+// function to handle posting new items up for auction
+/* function postAuction() {
+  // prompt for info about the item being put up for auction
+  inquirer
+    .prompt([
+      {
+        name: "item",
+        type: "input",
+        message: "What is the item you would like to submit?"
+      },
+      {
+        name: "category",
+        type: "input",
+        message: "What category would you like to place your auction in?"
+      },
+      {
+        name: "startingBid",
+        type: "input",
+        message: "What would you like your starting bid to be?",
+        validate: function(value) {
+          if (isNaN(value) === false) {
+            return true;
+          }
+          return false;
+        }
+      }
+    ])
+    .then(function(answer) {
+      // when finished prompting, insert a new item into the db with that info
+      connection.query(
+        "INSERT INTO auctions SET ?",
+        {
+          item_name: answer.item,
+          category: answer.category,
+          starting_bid: answer.startingBid,
+          highest_bid: answer.startingBid
+        },
+        function(err) {
+          if (err) throw err;
+          console.log("Your auction was created successfully!");
+          // re-prompt the user for if they want to bid or post
+          start();
+        }
+      );
+    });
+}
+ */
