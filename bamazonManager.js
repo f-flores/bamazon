@@ -180,6 +180,20 @@ var connection = mysql.createConnection({
 				arr = answer.chosenProduct.split(",");
 				idProd = parseInt(arr[0].slice("ID: ".length));
 				nameProd = arr[1].slice("PRODUCT: ".length);
+				connection.query(
+					"UPDATE products SET stock_quantity = stock_quantity +  ? WHERE ?",
+					[
+						parseInt(answer.stockToAdd),
+						{
+							item_id: idProd
+						}
+					],
+					function(error) {
+						if (error) throw err;
+						console.log("Updated stock quantity for " + nameProd + " successfully!");
+						startBamazonMgr();
+					}
+				);
 				// console.log(idProd);
 				// console.log(nameProd);
 				/* retrieves product name and stock quantity of current item id */
@@ -193,7 +207,7 @@ var connection = mysql.createConnection({
 				//		purchaseItem.productQty = res[0].stock_quantity;
 				//		promptPurchaseQty(purchaseItem);
 				//	});
-				startBamMgr();
+				// startBamMgr();
 			}
 			// getProductName();
 			// }
