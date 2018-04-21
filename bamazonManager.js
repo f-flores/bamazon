@@ -10,7 +10,9 @@
 const PAD_ITEM_ID = 8;
 const PAD_PRODUCT_NAME = 30;
 const PAD_PRICE = 10;
+const PAD_QTY = 6;
 const PRICE_DECIMAL = 2;
+const LOW_STOCK_VAL = 5;
 
 var mysql = require("mysql");
 var inquirer = require("inquirer");
@@ -83,19 +85,117 @@ var connection = mysql.createConnection({
 
 	};
 
+	// -----------------------------------------------------------------------------------------
+	// viewProductsForSale() produces report of item id's, product name, price and quantity
+	//
 	function viewProductsForSale() {
-		console.log("view products for sale");
-		startBamMgr();
+		var query;
+	
+		console.log("==================== PRODUCTS FOR SALE =========================".bold.blue);
+		console.log("ITEM ID".padStart(PAD_ITEM_ID).bold.yellow +
+			"   PRODUCT NAME  ".padStart(PAD_PRODUCT_NAME).bold.yellow + 
+			"        PRICE  ".padStart(PAD_PRICE).bold.yellow +
+			"   QUANTITY ".padStart(PAD_QTY).bold.yellow);
+		console.log("================================================================".bold.blue);
+		query = 
+		connection.query("SELECT item_id, product_name, price, stock_quantity FROM products", function(err, res) {
+			if (err) throw err;
+	
+			for (const product of res) {
+				console.log(
+					product.item_id.toString().padStart(PAD_ITEM_ID) + " | " + 
+					product.product_name.toUpperCase().padStart(PAD_PRODUCT_NAME) + " | " +
+					product.price.toFixed(PRICE_DECIMAL).toString().replace(/^/,"$").padStart(PAD_PRICE) + " | " +
+					product.stock_quantity.toString().padStart(PAD_QTY)
+				);
+			}
+			console.log("================================================================".bold.blue);
+			startBamMgr();
+		});
 	}
 
+	// -----------------------------------------------------------------------------------------
+	// viewLowInventory() displays products that have a low ( < 5) inventory
+	//
 	function viewLowInventory() {
-		console.log("view low inventory");
-		startBamMgr();
+		var query ="SELECT item_id, product_name, stock_quantity FROM products WHERE stock_quantity < ?";
+	
+		connection.query(query, [LOW_STOCK_VAL], function(err, res) {
+			if (err) throw err;
+	
+			console.log("=============== LOW INVENTORY REPORT ================".bold.blue);
+			console.log("=====================================================".bold.blue);
+			console.log("ITEM ID".padStart(PAD_ITEM_ID).bold.yellow + 
+			"PRODUCT NAME  ".padStart(PAD_PRODUCT_NAME - PAD_QTY).bold.yellow + 
+			"            QUANTITY ".padStart(PAD_QTY).bold.yellow);
+			for (const product of res) {
+				console.log(
+					product.item_id.toString().padStart(PAD_ITEM_ID) + " | " + 
+					product.product_name.toUpperCase().padEnd(PAD_PRODUCT_NAME) + " | " +
+					product.stock_quantity.toString().padStart(PAD_QTY)
+				);
+			}
+			console.log("=====================================================".bold.blue);
+			startBamMgr();
+		});
 	}
 
+	// -----------------------------------------------------------------------------------------
+	// addToInventory() displays products and lets manager add inventory
+	//
 	function addToInventory() {
-		console.log("add to inventory");
-		startBamMgr();
+		var query = "SELECT item_id, product_name FROM products";
+
+		connection.query(query, function(err, res) {
+			/* 
+			 * getChoiceList returns list of products 
+			 */
+			function getChoiceList() {
+				var chText = "", choices = [];
+
+				if (err) throw err;
+
+				for (const item of res) {
+					chText = "ID: " + item.item_id + ", PRODUCT: " + item.product_name;
+					choices.push(chText.magenta);
+				}
+			
+				return choices;
+			}
+
+			inquirer.prompt([
+				{
+					type: "list",
+					name: "idProduct",
+					message: "Add more of which product?",
+					choices: getChoiceList()
+				},
+				{
+					type: "input",
+          name: "stockToAdd",
+          message: "How many would you like to add?"
+        }
+			]).then(function(answer) {
+				console.log("You chose " + answer.idProduct);
+				/* retrieves product name and stock quantity of current item id */
+				// function getProductName() {
+				//	var query = "SELECT product_name, stock_quantity, price FROM products WHERE ?";
+				//	connection.query(query, { item_id: data.idProduct }, function(err, res) {
+				//		if (err) throw err;
+				//		purchaseItem.idProduct = data.idProduct;
+				//		purchaseItem.productPrice = res[0].price,
+				//		purchaseItem.productName =  res[0].product_name;
+				//		purchaseItem.productQty = res[0].stock_quantity;
+				//		promptPurchaseQty(purchaseItem);
+				//	});
+				startBamMgr();
+			}
+			// getProductName();
+			// }
+			);
+		});
+
+	//	});
 	}
 
 	function addToProduct() {
@@ -139,7 +239,7 @@ var connection = mysql.createConnection({
 			productQty: 0
 		}; */
 				
-		/* get total number of ids */
+	/* get total number of ids */
 	/* 		function getNumProducts() {
 			connection.query("SELECT COUNT(item_id) AS total_items, item_id FROM products", function(err, res) {
 				if (err) throw err;
