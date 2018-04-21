@@ -156,8 +156,8 @@ var connection = mysql.createConnection({
 				if (err) throw err;
 
 				for (const item of res) {
-					chText = "ID: " + item.item_id + ", PRODUCT: " + item.product_name;
-					choices.push(chText.magenta);
+					chText = "ID: " + item.item_id + ",PRODUCT: " + item.product_name;
+					choices.push(chText);
 				}
 			
 				return choices;
@@ -166,7 +166,7 @@ var connection = mysql.createConnection({
 			inquirer.prompt([
 				{
 					type: "list",
-					name: "idProduct",
+					name: "chosenProduct",
 					message: "Add more of which product?",
 					choices: getChoiceList()
 				},
@@ -176,10 +176,12 @@ var connection = mysql.createConnection({
 					message: "How many would you like to add?"
 				}
 			]).then(function(answer) {
-				var arr = [];
-				console.log("You chose " + answer.idProduct);
-				arr = answer.idProduct.split(", ");
-				console.log("Product: " + arr[1]);
+				var arr = [], idProd = "", nameProd = "";
+				arr = answer.chosenProduct.split(",");
+				idProd = parseInt(arr[0].slice("ID: ".length));
+				nameProd = arr[1].slice("PRODUCT: ".length);
+				// console.log(idProd);
+				// console.log(nameProd);
 				/* retrieves product name and stock quantity of current item id */
 				// function getProductName() {
 				//	var query = "SELECT product_name, stock_quantity, price FROM products WHERE ?";
