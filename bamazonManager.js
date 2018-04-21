@@ -172,11 +172,14 @@ var connection = mysql.createConnection({
 				},
 				{
 					type: "input",
-          name: "stockToAdd",
-          message: "How many would you like to add?"
-        }
+					name: "stockToAdd",
+					message: "How many would you like to add?"
+				}
 			]).then(function(answer) {
+				var arr = [];
 				console.log("You chose " + answer.idProduct);
+				arr = answer.idProduct.split(", ");
+				console.log("Product: " + arr[1]);
 				/* retrieves product name and stock quantity of current item id */
 				// function getProductName() {
 				//	var query = "SELECT product_name, stock_quantity, price FROM products WHERE ?";
