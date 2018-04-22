@@ -1,6 +1,6 @@
 // ===========================================================================================
 //
-//  File name: bamazon.js
+//  File name: bamazonCustomer.js
 //  Description:
 //  Date: April, 2018
 //  Author: Fabian Flores
@@ -109,7 +109,8 @@ var connection = mysql.createConnection({
 			productPrice: 0, 
 			numProducts: 0,
 			productName: "",
-			productQty: 0
+			productQty: 0,
+			sales: 0
 		};
 				
 		/* get total number of ids */
@@ -141,13 +142,14 @@ var connection = mysql.createConnection({
 		]).then(function(data) {
 			/* retrieves product name and stock quantity of current item id */
 			function getProductName() {
-				var query = "SELECT product_name, stock_quantity, price FROM products WHERE ?";
+				var query = "SELECT product_name, stock_quantity, price, product_sales FROM products WHERE ?";
 				connection.query(query, { item_id: data.idProduct }, function(err, res) {
 					if (err) throw err;
 					purchaseItem.idProduct = data.idProduct;
 					purchaseItem.productPrice = res[0].price,
 					purchaseItem.productName =  res[0].product_name;
 					purchaseItem.productQty = res[0].stock_quantity;
+					purchaseItem.sales = res[0].product_sales;
 					promptPurchaseQty(purchaseItem);
 				});
 			}
@@ -183,10 +185,11 @@ var connection = mysql.createConnection({
 			connection.query(query,
 				[
 					{
-						stock_quantity: newQty
+						stock_quantity: newQty,
+						product_sales: product.sales + answer.qty * product.productPrice 
 					},
 					{
-						item_id: product.idProduct
+						item_id: product.idProduct 
 					}
 				], function(err, res) {
 					var msgText = "****************************************************************\n*\n";

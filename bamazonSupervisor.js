@@ -1,6 +1,6 @@
 // ===========================================================================================
 //
-//  File name: bamazonManager.js
+//  File name: bamazonSupervisor.js
 //  Description:
 //  Date: April, 2018
 //  Author: Fabian Flores
@@ -253,10 +253,10 @@ var connection = mysql.createConnection({
 						deptId = parseInt(res[0].department_id);
 						insertNewItem(deptId);
 					} else {
-						// else create new department_name and department_id
 						connection.query("INSERT INTO departments SET ?", 
 							[{department_name: answer.dept}], function(error, result) {
 								if (error) throw error;
+								console.log("new deptid: " + result);
 								deptId = parseInt(result[0].department_id);
 								insertNewItem(deptId);
 							});
