@@ -25,18 +25,18 @@ VALUE("dozen rocky ankle socks", 1, 6.99, 50);
 
 INSERT INTO products (product_name, dept_id, price, stock_quantity)
 VALUES
-  ("file cabinet", 2, 80.00, 10),
-  ("desk", 2, 120.00, 5),
-  ("letter envelopes 50 pack", 3, 3.99, 40),
-  ("blender", 4, 45.00, 30),
-  ("toaster", 4, 26.99, 40),
-  ("stapler", 5, 12.99, 40);
+  ("file cabinet", 2, 80.00, 20),
+  ("desk", 2, 120.00, 10),
+  ("letter envelopes 50 pack", 3, 3.99, 100),
+  ("blender", 4, 45.00, 60),
+  ("toaster", 4, 26.99, 80),
+  ("stapler", 5, 12.99, 100);
 
 INSERT INTO products (product_name, dept_id, price, stock_quantity)
-VALUE("white v-neck t-shirt", 1, 4.99, 100);
+VALUE("white v-neck t-shirt", 1, 4.99, 200);
 
 INSERT INTO products (product_name, dept_id, price, stock_quantity)
-VALUE("desk chair", 2, 65.00, 10);
+VALUE("desk chair", 2, 65.00, 40);
 
 -- create departments table --
 CREATE TABLE  departments (
@@ -49,11 +49,11 @@ CREATE TABLE  departments (
 -- insert values into departments table --
 INSERT INTO departments (department_name, overhead_costs)
 VALUES
-  ("clothing", 1500),
-  ("office furniture", 2000),
-  ("stationery", 1100),
-  ("kitchen appliance", 1900),
-  ("office supply", 1400);
+  ("clothing", 300),
+  ("office furniture", 600),
+  ("stationery", 200),
+  ("kitchen appliance", 400),
+  ("office supply", 250);
 
   -- add column product_sales to products table --
   ALTER TABLE products ADD COLUMN product_sales DECIMAL(15,3) DEFAULT 0;

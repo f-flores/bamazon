@@ -103,10 +103,8 @@ var connection = mysql.createConnection({
 	
 			for (const product of res) {
 				console.log(
-					product.item_id.toString().padStart(PAD_ITEM_ID) + " | " + 
-					product.product_name.toUpperCase().padStart(PAD_PRODUCT_NAME) + " | " +
-					product.price.toFixed(PRICE_DECIMAL).toString().replace(/^/,"$").padStart(PAD_PRICE) + " | " +
-					product.stock_quantity.toString().padStart(PAD_QTY)
+					product.item_id.toString().padStart(PAD_ITEM_ID) + " | " + product.product_name.toUpperCase().padStart(PAD_PRODUCT_NAME) + " | " +					product.price.toFixed(PRICE_DECIMAL).toString().replace(/^/,"$").padStart(PAD_PRICE) + " | " +
+					product.stock_quantity.toString().padStart(PAD_QTY);
 				);
 			}
 			console.log("================================================================".bold.blue);
