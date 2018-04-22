@@ -34,6 +34,18 @@ var connection = mysql.createConnection({
 
 // IEEF function
 (function() {
+
+	// -----------------------------------------------------------------------------------------
+	// prints out header in products for sale report
+	//
+	function printProductsReportHeader() {
+		console.log("==================== PRODUCTS FOR SALE =========================".bold.blue);
+		console.log("ITEM ID".padStart(PAD_ITEM_ID).bold.yellow +
+			"   PRODUCT NAME  ".padStart(PAD_PRODUCT_NAME).bold.yellow + 
+			"        PRICE  ".padStart(PAD_PRICE).bold.yellow +
+			"   QUANTITY ".padStart(PAD_QTY).bold.yellow);
+		console.log("================================================================".bold.blue);
+	}
 	// -----------------------------------------------------------------------------------------
 	// connectToDatabase() connects to the bamazon_db database
 	//
@@ -89,22 +101,15 @@ var connection = mysql.createConnection({
 	// viewProductsForSale() produces report of item id's, product name, price and quantity
 	//
 	function viewProductsForSale() {
-		var query;
 	
-		console.log("==================== PRODUCTS FOR SALE =========================".bold.blue);
-		console.log("ITEM ID".padStart(PAD_ITEM_ID).bold.yellow +
-			"   PRODUCT NAME  ".padStart(PAD_PRODUCT_NAME).bold.yellow + 
-			"        PRICE  ".padStart(PAD_PRICE).bold.yellow +
-			"   QUANTITY ".padStart(PAD_QTY).bold.yellow);
-		console.log("================================================================".bold.blue);
-		query = 
+		printProductsReportHeader();
 		connection.query("SELECT item_id, product_name, price, stock_quantity FROM products", function(err, res) {
 			if (err) throw err;
 	
 			for (const product of res) {
 				console.log(
 					product.item_id.toString().padStart(PAD_ITEM_ID) + " | " + product.product_name.toUpperCase().padStart(PAD_PRODUCT_NAME) + " | " +					product.price.toFixed(PRICE_DECIMAL).toString().replace(/^/,"$").padStart(PAD_PRICE) + " | " +
-					product.stock_quantity.toString().padStart(PAD_QTY);
+					product.stock_quantity.toString().padStart(PAD_QTY)
 				);
 			}
 			console.log("================================================================".bold.blue);
