@@ -9,14 +9,16 @@
 
 const PAD_ITEM_ID = 8;
 const PAD_PRODUCT_NAME = 30;
-const PAD_PRICE = 10;
+// const PAD_PRICE = 10;
 const PAD_QTY = 6;
 const PRICE_DECIMAL = 2;
 const LOW_STOCK_VAL = 5;
 
 var mysql = require("mysql");
 var inquirer = require("inquirer");
-var colors = require("colors");
+const {table} = require("table");
+
+require("colors");
 
 var connection = mysql.createConnection({
 	host: "localhost",
@@ -82,27 +84,52 @@ var connection = mysql.createConnection({
 	// viewProductSalesByDept() 
 	//
 	function viewProductSalesByDept() {
-		var query;
-	
-		console.log("==================== PRODUCTS FOR SALE =========================".bold.blue);
-		console.log("ITEM ID".padStart(PAD_ITEM_ID).bold.yellow +
-			"   PRODUCT NAME  ".padStart(PAD_PRODUCT_NAME).bold.yellow + 
-			"        PRICE  ".padStart(PAD_PRICE).bold.yellow +
-			"   QUANTITY ".padStart(PAD_QTY).bold.yellow);
-		console.log("================================================================".bold.blue);
-		query = 
-		connection.query("SELECT item_id, product_name, price, stock_quantity FROM products", function(err, res) {
+		var query = 
+			"SELECT dept.department_id, dept.department_name, dept.overhead_costs, SUM(prod.product_sales) AS \
+			product_sales, SUM(prod.product_sales) - dept.overhead_costs AS total_profit \
+			FROM products AS prod \
+			LEFT JOIN departments AS dept \
+			ON prod.dept_id = dept.department_id	\
+			GROUP BY prod.dept_id";
+
+		connection.query(query, function(err, res) {
+			var output, config, innerArr = [], data = [];
 			if (err) throw err;
-	
-			for (const product of res) {
-				console.log(
-					product.item_id.toString().padStart(PAD_ITEM_ID) + " | " + 
-					product.product_name.toUpperCase().padStart(PAD_PRODUCT_NAME) + " | " +
-					product.price.toFixed(PRICE_DECIMAL).toString().replace(/^/,"$").padStart(PAD_PRICE) + " | " +
-					product.stock_quantity.toString().padStart(PAD_QTY)
+
+			config = {
+				columns: {
+					0: {
+						alignment: "center"
+					},
+					1: {
+						alignment: "left"
+					},
+					2: {
+						alignment: "right"
+					},
+					3: {
+						alignment: "right"
+					},
+					4: {
+						alignment: "right"
+					}
+				}
+			};
+
+			data.push(Object.keys(res[0]));
+			for (const item of res) {
+				innerArr.push(item.department_id.toString(), 
+					item.department_name.toUpperCase(),
+					item.overhead_costs.toFixed(PRICE_DECIMAL).toString().replace(/^/,"$"),
+					item.product_sales.toFixed(PRICE_DECIMAL).toString().replace(/^/,"$"),
+					item.total_profit.toFixed(PRICE_DECIMAL).toString().replace(/^/,"$")
 				);
+				data.push(innerArr);
+				innerArr = [];
 			}
-			console.log("================================================================".bold.blue);
+
+			output = table(data, config);
+			console.log(output);
 			startBamSpr();
 		});
 	}
