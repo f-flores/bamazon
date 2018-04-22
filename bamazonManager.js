@@ -202,98 +202,119 @@ var connection = mysql.createConnection({
 	}
 
 	function addProduct() {
-		inquirer.prompt([
-			{
-				name: "product",
-				type: "input",
-				message: "What is the product you would like to add?"
-			},
-			{
-				name: "price",
-				type: "input",
-				message: "What is the price of the product?",
-				validate: function(value) {
-					var msgText ="";
+		var dptQuery = "SELECT department_name FROM departments";
 
-					if (isNaN(value) === false && value > 0) {
-						return true;
-					}
-					msgText = "\nPlease enter a valid price.";
-					console.log(msgText.bold.red);
-					return false;
+		connection.query(dptQuery, function(err, results) {
+			if (err) throw err;
+
+			/* 
+			 * getChoiceList returns list of products 
+			 */
+			function getDeptList() {
+				var deptChoices = [];
+
+				if (err) throw err;
+
+				for (const item of results) {
+					deptChoices.push(item.department_name);
 				}
-			},
-			{
-				name: "dept",
-				type: "input",
-				message: "In what department does the product belong?"
-			},
-			{
-				name: "qty",
-				type: "input",
-				message: "How many are you placing into stock?",
-				validate: function(value) {
-					var msgText = "";
-	
-					if (isNaN(value) === false && value > 0) {
-						return true;
-					}
-					msgText = "\nPlease enter a valid quantity.";
-					console.log(msgText.bold.red);
-					return false;
-				}
+			
+				return deptChoices;
 			}
-		]).then(function(answer) {
+
+			inquirer.prompt([
+				{
+					name: "product",
+					type: "input",
+					message: "What is the product you would like to add?"
+				},
+				{
+					name: "price",
+					type: "input",
+					message: "What is the price of the product?",
+					validate: function(value) {
+						var msgText ="";
+
+						if (isNaN(value) === false && value > 0) {
+							return true;
+						}
+						msgText = "\nPlease enter a valid price.";
+						console.log(msgText.bold.red);
+						return false;
+					}
+				},
+				{
+					name: "dept",
+					type: "list",
+					message: "In what department does the product belong?",
+					choices: getDeptList()
+				},
+				{
+					name: "qty",
+					type: "input",
+					message: "How many are you placing into stock?",
+					validate: function(value) {
+						var msgText = "";
+	
+						if (isNaN(value) === false && value > 0) {
+							return true;
+						}
+						msgText = "\nPlease enter a valid quantity.";
+						console.log(msgText.bold.red);
+						return false;
+					}
+				}
+			]).then(function(answer) {
 			// find out if department already exists		
-			var deptId = -1, query ="SELECT department_id FROM departments WHERE ?";
+				var deptId = -1, query ="SELECT department_id FROM departments WHERE ?";
 	
-			connection.query(query, 
-				[	{department_name: answer.dept }], function(err, res) {
-					if (err) throw err;
-	
-					if (res.length > 0) {
-						// department_name already exists, insert new item with existing department_id
-						deptId = parseInt(res[0].department_id);
-						insertNewItem(deptId);
-					} else {
-						// else create new department_name and department_id
-						connection.query("INSERT INTO departments SET ?", 
-							[{department_name: answer.dept}], function(error, result) {
-								if (error) throw error;
-								deptId = parseInt(result[0].department_id);
-								insertNewItem(deptId);
-							});
-					}
-				});
-
-			// if affected rows > 0 grab dept_id (department_name already exists)
-			// otherwise insert department name into departments table
-
-			// insert into products with that dept_id
-			// when finished prompting, insert a new item into the db with that info
-			function insertNewItem(dept) {
-				connection.query(
-					"INSERT INTO products SET ?",
-					{
-						product_name: answer.product,
-						dept_id: dept,
-						price: answer.price,
-						stock_quantity: answer.qty
-					},
-					function(err, res) {
-						var outputTxt = "";
-		
+				connection.query(query, 
+					[	{department_name: answer.dept }], function(err, res) {
 						if (err) throw err;
-						outputTxt = answer.product + " added successfully!";
-						outputTxt += res.affectedRows + " rows added.";
-						console.log(outputTxt.yellow);
+	
+						if (res.length > 0) {
+						// department_name already exists, insert new item with existing department_id
+							deptId = parseInt(res[0].department_id);
+							insertNewItem(deptId);
+						} else {
+						// else create new department_name and department_id
+							connection.query("INSERT INTO departments SET ?", 
+								[{department_name: answer.dept}], function(error, result) {
+									if (error) throw error;
+									deptId = parseInt(result[0].department_id);
+									insertNewItem(deptId);
+								});
+						}
+					});
 
-						startBamMgr();
-					}
-				);
-			}
+				// if affected rows > 0 grab dept_id (department_name already exists)
+				// otherwise insert department name into departments table
+
+				// insert into products with that dept_id
+				// when finished prompting, insert a new item into the db with that info
+				function insertNewItem(dept) {
+					connection.query(
+						"INSERT INTO products SET ?",
+						{
+							product_name: answer.product,
+							dept_id: dept,
+							price: answer.price,
+							stock_quantity: answer.qty
+						},
+						function(err, res) {
+							var outputTxt = "";
+		
+							if (err) throw err;
+							outputTxt = answer.product + " added successfully!";
+							outputTxt += res.affectedRows + " rows added.";
+							console.log(outputTxt.yellow);
+
+							startBamMgr();
+						}
+					);
+				}
+			});
 		});
-
 	}
 
 	var startBamazonMgr = connectToDatabase();

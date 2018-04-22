@@ -185,8 +185,10 @@ var connection = mysql.createConnection({
 					} else {
 						// else create new department_name and department_id
 						connection.query("INSERT INTO departments SET ?", 
-							[{department_name: answer.newDpt},
-								{overhead_costs: answer.ovCosts}], function(error) {
+							[{
+								department_name: answer.newDpt,
+								overhead_costs: answer.ovCosts
+							}], function(error) {
 								if (error) throw error;
 								console.log(answer.newDpt + " added successfully to departments database");
 								startBamazonSpr();
@@ -195,7 +197,6 @@ var connection = mysql.createConnection({
 				});
 
 		});
-
 	}
 
 

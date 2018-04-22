@@ -115,9 +115,9 @@ var connection = mysql.createConnection({
 				
 		/* get total number of ids */
 		function getNumProducts() {
-			connection.query("SELECT COUNT(item_id) AS total_items, item_id FROM products", function(err, res) {
+			connection.query("SELECT item_id FROM products ORDER BY item_id DESC", function(err, res) {
 				if (err) throw err;
-				purchaseItem.numProducts =  res[0].total_items;
+				purchaseItem.numProducts =  res[0].item_id;
 			});
 		}
 
