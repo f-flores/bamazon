@@ -7,12 +7,12 @@
 //
 // ===========================================================================================
 
-const PAD_ITEM_ID = 8;
-const PAD_PRODUCT_NAME = 30;
+// const PAD_ITEM_ID = 8;
+// const PAD_PRODUCT_NAME = 30;
 // const PAD_PRICE = 10;
-const PAD_QTY = 6;
+// const PAD_QTY = 6;
 const PRICE_DECIMAL = 2;
-const LOW_STOCK_VAL = 5;
+// const LOW_STOCK_VAL = 5;
 
 var mysql = require("mysql");
 var inquirer = require("inquirer");
@@ -93,7 +93,7 @@ var connection = mysql.createConnection({
 			GROUP BY prod.dept_id";
 
 		connection.query(query, function(err, res) {
-			var output, config, innerArr = [], data = [];
+			var output, config, rowArr = [], data = [];
 			if (err) throw err;
 
 			config = {
@@ -118,14 +118,14 @@ var connection = mysql.createConnection({
 
 			data.push(Object.keys(res[0]));
 			for (const item of res) {
-				innerArr.push(item.department_id.toString(), 
+				rowArr.push(item.department_id.toString(), 
 					item.department_name.toUpperCase(),
 					item.overhead_costs.toFixed(PRICE_DECIMAL).toString().replace(/^/,"$"),
 					item.product_sales.toFixed(PRICE_DECIMAL).toString().replace(/^/,"$"),
 					item.total_profit.toFixed(PRICE_DECIMAL).toString().replace(/^/,"$")
 				);
-				data.push(innerArr);
-				innerArr = [];
+				data.push(rowArr);
+				rowArr = [];
 			}
 
 			output = table(data, config);
@@ -138,26 +138,64 @@ var connection = mysql.createConnection({
 	// createNewDept() displays products that have a low ( < 5) inventory
 	//
 	function createNewDept() {
-		var query ="SELECT item_id, product_name, stock_quantity FROM products WHERE stock_quantity < ?";
-	
-		connection.query(query, [LOW_STOCK_VAL], function(err, res) {
-			if (err) throw err;
-	
-			console.log("=============== LOW INVENTORY REPORT ================".bold.blue);
-			console.log("=====================================================".bold.blue);
-			console.log("ITEM ID".padStart(PAD_ITEM_ID).bold.yellow + 
-			"PRODUCT NAME  ".padStart(PAD_PRODUCT_NAME - PAD_QTY).bold.yellow + 
-			"            QUANTITY ".padStart(PAD_QTY).bold.yellow);
-			for (const product of res) {
-				console.log(
-					product.item_id.toString().padStart(PAD_ITEM_ID) + " | " + 
-					product.product_name.toUpperCase().padEnd(PAD_PRODUCT_NAME) + " | " +
-					product.stock_quantity.toString().padStart(PAD_QTY)
-				);
+		inquirer.prompt([
+			{
+				name: "newDpt",
+				type: "input",
+				message: "What department would like to add?",
+				validate: function(value) {
+					var msgText ="";
+
+					if (typeof value === "string" && value.length > 0) {
+						return true;
+					}
+					msgText = "\nPlease enter a valid department name.";
+					console.log(msgText.bold.red);
+					return false;
+				} 
+			},
+			{
+				name: "ovCosts",
+				type: "input",
+				message: "What is the overhead price for this department?",
+				validate: function(value) {
+					var msgText ="";
+
+					if (isNaN(value) === false && value > 0) {
+						return true;
+					}
+					msgText = "\nPlease enter a valid price.";
+					console.log(msgText.bold.red);
+					return false;
+				}
+
 			}
-			console.log("=====================================================".bold.blue);
-			startBamSpr();
+		]).then(function(answer) {
+			// find out if department already exists		
+			var query ="SELECT department_id FROM departments WHERE ?";
+	
+			connection.query(query, 
+				[	{department_name: answer.newDpt }], function(err, res) {
+					if (err) throw err;
+	
+					if (res.length > 0) {
+						// department_name already exists, insert new item with existing department_id
+						console.log("The " + answer.newDpt + " department already exists.");
+						startBamazonSpr();
+					} else {
+						// else create new department_name and department_id
+						connection.query("INSERT INTO departments SET ?", 
+							[{department_name: answer.newDpt},
+								{overhead_costs: answer.ovCosts}], function(error) {
+								if (error) throw error;
+								console.log(answer.newDpt + " added successfully to departments database");
+								startBamazonSpr();
+							});
+					}
+				});
+
 		});
+
 	}
 
 

@@ -266,7 +266,7 @@ var connection = mysql.createConnection({
 					}
 				});
 
-			// if affected rows > 0 grab dept_id
+			// if affected rows > 0 grab dept_id (department_name already exists)
 			// otherwise insert department name into departments table
 
 			// insert into products with that dept_id
