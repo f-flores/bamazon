@@ -41,40 +41,33 @@ var connection = mysql.createConnection({
 		connection.connect(function(err) {
 			if (err) throw err;
 		});
-		function beginMgr() {
-			startBamMgr();
+		function beginSpr() {
+			startBamSpr();
 		}
-		return beginMgr;
+		return beginSpr;
 	}
 
-	var startBamMgr = function () {
+	var startBamSpr = function () {
 		inquirer.prompt([
 
 			{
 				type: "list",
 				name: "userChoice",
 				message: "Please choose one",
-				choices: [ "VIEW PRODUCTS FOR SALE", "VIEW LOW INVENTORY", "ADD TO INVENTORY", 
-					"ADD PRODUCT", "EXIT BAMAZON"]
+				choices: [ "VIEW PRODUCT SALES BY DEPARTMENT", "CREATE NEW DEPARTMENT", "EXIT BAMAZON"]
 			}
 
 		// After the prompt, store the user's response in a variable called location.
 		]).then(function(answer) {
 			switch(answer.userChoice) {
-			case "VIEW PRODUCTS FOR SALE":
-				viewProductsForSale();
+			case "VIEW PRODUCT SALES BY DEPARTMENT":
+				viewProductSalesByDept();
 				break;
-			case "VIEW LOW INVENTORY":
-				viewLowInventory();
-				break;
-			case "ADD TO INVENTORY":
-				addToInventory();
-				break;
-			case "ADD PRODUCT":
-				addProduct();
+			case "CREATE NEW DEPARTMENT":
+				createNewDept();
 				break;
 			case "EXIT BAMAZON":
-				console.log("Leaving bamazon Manager... Thank you!".green);
+				console.log("Leaving bamazon Supervisor... Thank you!".green);
 				connection.end();
 				break;
 			default:
@@ -86,9 +79,9 @@ var connection = mysql.createConnection({
 	};
 
 	// -----------------------------------------------------------------------------------------
-	// viewProductsForSale() produces report of item id's, product name, price and quantity
+	// viewProductSalesByDept() 
 	//
-	function viewProductsForSale() {
+	function viewProductSalesByDept() {
 		var query;
 	
 		console.log("==================== PRODUCTS FOR SALE =========================".bold.blue);
@@ -110,14 +103,14 @@ var connection = mysql.createConnection({
 				);
 			}
 			console.log("================================================================".bold.blue);
-			startBamMgr();
+			startBamSpr();
 		});
 	}
 
 	// -----------------------------------------------------------------------------------------
-	// viewLowInventory() displays products that have a low ( < 5) inventory
+	// createNewDept() displays products that have a low ( < 5) inventory
 	//
-	function viewLowInventory() {
+	function createNewDept() {
 		var query ="SELECT item_id, product_name, stock_quantity FROM products WHERE stock_quantity < ?";
 	
 		connection.query(query, [LOW_STOCK_VAL], function(err, res) {
@@ -136,165 +129,13 @@ var connection = mysql.createConnection({
 				);
 			}
 			console.log("=====================================================".bold.blue);
-			startBamMgr();
+			startBamSpr();
 		});
 	}
 
-	// -----------------------------------------------------------------------------------------
-	// addToInventory() displays products and lets manager add inventory
-	//
-	function addToInventory() {
-		var query = "SELECT item_id, product_name FROM products";
 
-		connection.query(query, function(err, res) {
-			/* 
-			 * getChoiceList returns list of products 
-			 */
-			function getChoiceList() {
-				var chText = "", choices = [];
+	var startBamazonSpr = connectToDatabase();
 
-				if (err) throw err;
-
-				for (const item of res) {
-					chText = "ID: " + item.item_id + ",PRODUCT: " + item.product_name;
-					choices.push(chText);
-				}
-			
-				return choices;
-			}
-
-			inquirer.prompt([
-				{
-					type: "list",
-					name: "chosenProduct",
-					message: "Add more of which product?",
-					choices: getChoiceList()
-				},
-				{
-					type: "input",
-					name: "stockToAdd",
-					message: "How many would you like to add?"
-				}
-			]).then(function(answer) {
-				var arr = [], idProd = "", nameProd = "";
-				arr = answer.chosenProduct.split(",");
-				idProd = parseInt(arr[0].slice("ID: ".length));
-				nameProd = arr[1].slice("PRODUCT: ".length);
-				connection.query(
-					"UPDATE products SET stock_quantity = stock_quantity +  ? WHERE ?",
-					[
-						parseInt(answer.stockToAdd),
-						{
-							item_id: idProd
-						}
-					],
-					function(error) {
-						if (error) throw err;
-						console.log("Updated stock quantity for " + nameProd + " successfully!");
-						startBamazonMgr();
-					});
-			});
-		});
-
-	}
-
-	function addProduct() {
-		inquirer.prompt([
-			{
-				name: "product",
-				type: "input",
-				message: "What is the product you would like to add?"
-			},
-			{
-				name: "price",
-				type: "input",
-				message: "What is the price of the product?",
-				validate: function(value) {
-					var msgText ="";
-
-					if (isNaN(value) === false && value > 0) {
-						return true;
-					}
-					msgText = "\nPlease enter a valid price.";
-					console.log(msgText.bold.red);
-					return false;
-				}
-			},
-			{
-				name: "dept",
-				type: "input",
-				message: "In what department does the product belong?"
-			},
-			{
-				name: "qty",
-				type: "input",
-				message: "How many are you placing into stock?",
-				validate: function(value) {
-					var msgText = "";
-	
-					if (isNaN(value) === false && value > 0) {
-						return true;
-					}
-					msgText = "\nPlease enter a valid quantity.";
-					console.log(msgText.bold.red);
-					return false;
-				}
-			}
-		]).then(function(answer) {
-			// find out if department already exists		
-			var deptId = -1, query ="SELECT department_id FROM departments WHERE ?";
-	
-			connection.query(query, 
-				[	{department_name: answer.dept }], function(err, res) {
-					if (err) throw err;
-	
-					if (res.length > 0) {
-						// department_name already exists, insert new item with existing department_id
-						deptId = parseInt(res[0].department_id);
-						insertNewItem(deptId);
-					} else {
-						connection.query("INSERT INTO departments SET ?", 
-							[{department_name: answer.dept}], function(error, result) {
-								if (error) throw error;
-								console.log("new deptid: " + result);
-								deptId = parseInt(result[0].department_id);
-								insertNewItem(deptId);
-							});
-					}
-				});
-
-			// if affected rows > 0 grab dept_id
-			// otherwise insert department name into departments table
-
-			// insert into products with that dept_id
-			// when finished prompting, insert a new item into the db with that info
-			function insertNewItem(dept) {
-				connection.query(
-					"INSERT INTO products SET ?",
-					{
-						product_name: answer.product,
-						dept_id: dept,
-						price: answer.price,
-						stock_quantity: answer.qty
-					},
-					function(err, res) {
-						var outputTxt = "";
-		
-						if (err) throw err;
-						outputTxt = answer.product + " added successfully!";
-						outputTxt += res.affectedRows + " rows added.";
-						console.log(outputTxt.yellow);
-
-						startBamMgr();
-					}
-				);
-			}
-		});
-
-	}
-
-	var startBamazonMgr = connectToDatabase();
-
-	startBamazonMgr();
+	startBamazonSpr();
 
 })();
