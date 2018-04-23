@@ -1,7 +1,8 @@
 // ===========================================================================================
 //
 //  File name: bamazonSupervisor.js
-//  Description:
+//  Description: This module lists and executes a pair of actions available to store 
+//		supervisors, "View Product Sales by Department" and "Create Department".
 //  Date: April, 2018
 //  Author: Fabian Flores
 //
