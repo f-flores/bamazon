@@ -8,7 +8,7 @@ bamazon is a command line application which uses nodejs. It is an amazon-like st
 
 `node ./bamazonManager.js` -
 
-`node ./bamazonSupervisor.js` -
+`node ./bamazonSupervisor.js` - lists and executes a pair of actions available to store supervisors, "View Product Sales by Department" and "Create Department".
 
 ## Description
 
