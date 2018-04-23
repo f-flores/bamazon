@@ -61,7 +61,15 @@ Below are the prompts displayed to a Manager when adding inventory for the chose
 
 ### `node ./bamazonSupervisor.js`
 
-Lists and executes a pair of actions available to store supervisors, "View Product Sales by Department" and "Create Department"
+Lists and executes a pair of actions available to store supervisors, "View Product Sales by Department" and "Create Department".
+
+For "View Product Sales by Department", the app produces a sales report, grouped by departments. The total profit generated for each department is listed to the right.
+
+![alt text](./assets/images/bamazonSupViewSales.gif "bamazonSupervisor View Sales")
+
+The "Create Department" option allows the supervisor to create the department and specify the overhead cost of the newly added store section.
+
+![alt text](./assets/images/bamazonSupCreateDept.gif "bamazonSupervisor Create Department")
 
 
 ## Installation
@@ -82,5 +90,5 @@ However, in order to successfully run this app, a few programs must be already i
 
 ## Comments
 
-The ConstructorHangman app was added to my github portfolio:
+The source code for the bamazon app was added to my github page:
 [bamazon](https://github.com/f-flores/bamazon)
