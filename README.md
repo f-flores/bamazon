@@ -2,17 +2,25 @@
 
 bamazon is a command line application which uses nodejs. It is an amazon-like store front. The app leverages MySQL to keep track of purchase orders and inventory and produces reports for would be managers and supervisors of this virtual store.
 
-The products table has the following columns:
+The `bamazon_db` database consists of two tables, `products` and  `departments`. The ``products table has the following columns:
 
 * item_id (unique id for each product)
 
 * product_name (Name of product)
 
-* department_name
+* dept_id (id of product's department - Note that this field references the `departments` table)
 
 * price (cost to customer)
 
 * stock_quantity (how much of the product is available in stores)
+
+The `departments` table includes the following:
+
+* department_id (unique id for each department)
+
+* department_name (name of the department)
+
+* overhead_costs (cost to install and run department)
 
 ## Usage
 
