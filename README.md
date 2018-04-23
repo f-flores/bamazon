@@ -65,11 +65,11 @@ Lists and executes a pair of actions available to store supervisors, "View Produ
 
 For "View Product Sales by Department", the app produces a sales report, grouped by departments. The total profit generated for each department is listed to the right.
 
-![alt text](./assets/images/bamazonSupViewSales.gif "bamazonSupervisor View Sales")
+![alt text](./assets/images/bamSupViewSales.gif "bamazonSupervisor View Sales")
 
 The "Create Department" option allows the supervisor to create the department and specify the overhead cost of the newly added store section.
 
-![alt text](./assets/images/bamazonSupCreateDept.gif "bamazonSupervisor Create Department")
+![alt text](./assets/images/bamSupCreateDept.gif "bamazonSupervisor Create Department")
 
 
 ## Installation
