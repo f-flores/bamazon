@@ -27,7 +27,7 @@ The `departments` table includes the following:
 
 ## Usage
 
-`node ./bamazonCustomer.js`
+### `node ./bamazonCustomer.js`
 
 The bamazon customer module will display all of the items available for sale. The id, product names and prices are displayed. The user is then presented with two messages.
 
@@ -37,20 +37,32 @@ The bamazon customer module will display all of the items available for sale. Th
 
 ![alt text](./assets/images/bamazonCustomer.gif "bamazonCustomer Module Flow")
 
-`node ./bamazonManager.js`
+### `node ./bamazonManager.js`
+
 bamazonManager.js. presents a bamazon store manager with a list of menu options:
 
-1. View Products for Sale - produces a report that shows item IDs, names, prices, and quantities. The manager can observe the stock quantity available for each product.
+* View Products for Sale - produces a report that shows item IDs, names, prices, and quantities. The manager can observe the stock quantity available for each product.
 
-2. View Low Inventory - this option lists all products with an inventory lower than five.
+* View Low Inventory - this option lists all products with an inventory lower than five.
+
+The image below displays the results of the "VIEW PRODUCTS FOR SALE" and "VIEW LOW INVENTORY" options for the current bamazon_db.
 
 ![alt text](./assets/images/bamazonManager01.gif "bamazonManager view products and low inventory")
 
-3. Add to Inventory
+* Add to Inventory - Through this function, the manager can place more stock of the selected item into inventory. In turn, the `products` table is updated.
 
-4. Add New Product
+Below are the prompts displayed to a Manager when adding inventory for the chosen product:
 
-`node ./bamazonSupervisor.js` - lists and executes a pair of actions available to store supervisors, "View Product Sales by Department" and "Create Department".
+![alt text](./assets/images/bamazonManagerAddInventory.gif "bamazonManager Add Inventory")
+
+* Add New Product - A manager can add a completely new product to the bamazon database. The manager has to fill out the product name, price, the product's department and an initial stock quantity.
+
+![alt text](./assets/images/bamazonManagerAddProduct.gif "bamazonManager Add Product")
+
+### `node ./bamazonSupervisor.js`
+
+Lists and executes a pair of actions available to store supervisors, "View Product Sales by Department" and "Create Department"
+
 
 ## Installation
 
