@@ -24,10 +24,7 @@ The bamazon customer module will display all of the items available for sale. Th
 
 2. The second message asks how many units of the product the user would like to purchase.
 
-The bamazon customer can purchase a product.:
-![alt text][bamazonCustomer]
-
-[bamazonCustomer]: ./assets/images/bamazonCustomer.gif "bamazonCustomer Module Flow"
+![alt text](./assets/images/bamazonCustomer.gif "bamazonCustomer Module Flow")
 
 `node ./bamazonManager.js` -
 
