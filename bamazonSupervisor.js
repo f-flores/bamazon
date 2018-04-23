@@ -7,12 +7,7 @@
 //
 // ===========================================================================================
 
-// const PAD_ITEM_ID = 8;
-// const PAD_PRODUCT_NAME = 30;
-// const PAD_PRICE = 10;
-// const PAD_QTY = 6;
 const PRICE_DECIMAL = 2;
-// const LOW_STOCK_VAL = 5;
 
 var mysql = require("mysql");
 var inquirer = require("inquirer");
