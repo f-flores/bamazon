@@ -5,6 +5,10 @@ bamazon is a command line application which uses nodejs. It is an amazon-like st
 ## Usage
 
 `node ./bamazonCustomer.js` -
+Reference-style: 
+![alt text][bamazonCustomer]
+
+[bamazonCustomer]: ./assets/images/bamazonCustomer.gif "bamazonCustomer Module Flow"
 
 `node ./bamazonManager.js` -
 
