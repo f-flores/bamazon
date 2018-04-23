@@ -1,5 +1,8 @@
 # bamazon
 
+## Description
+
+This terminal based app
 bamazon is a command line application which uses nodejs. It is an amazon-like store front. The app leverages MySQL to keep track of purchase orders and inventory and produces reports for would be managers and supervisors of this virtual store.
 
 The `bamazon_db` database consists of two tables, `products` and  `departments`. The ``products table has the following columns:
@@ -34,13 +37,20 @@ The bamazon customer module will display all of the items available for sale. Th
 
 ![alt text](./assets/images/bamazonCustomer.gif "bamazonCustomer Module Flow")
 
-`node ./bamazonManager.js` -
+`node ./bamazonManager.js`
+bamazonManager.js. presents a bamazon store manager with a list of menu options:
+
+1. View Products for Sale - produces a report that shows item IDs, names, prices, and quantities. The manager can observe the stock quantity available for each product.
+
+2. View Low Inventory - this option lists all products with an inventory lower than five.
+
+![alt text](./assets/images/bamazonManager01.gif "bamazonManager view products and low inventory")
+
+3. Add to Inventory
+
+4. Add New Product
 
 `node ./bamazonSupervisor.js` - lists and executes a pair of actions available to store supervisors, "View Product Sales by Department" and "Create Department".
-
-## Description
-
-This terminal based app
 
 ## Installation
 
