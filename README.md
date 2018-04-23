@@ -2,10 +2,29 @@
 
 bamazon is a command line application which uses nodejs. It is an amazon-like store front. The app leverages MySQL to keep track of purchase orders and inventory and produces reports for would be managers and supervisors of this virtual store.
 
+The products table has the following columns:
+
+* item_id (unique id for each product)
+
+* product_name (Name of product)
+
+* department_name
+
+* price (cost to customer)
+
+* stock_quantity (how much of the product is available in stores)
+
 ## Usage
 
-`node ./bamazonCustomer.js` -
-Reference-style: 
+`node ./bamazonCustomer.js`
+
+The bamazon customer module will display all of the items available for sale. The id, product names and prices are displayed. The user is then presented with two messages.
+
+1. The first asks for the ID of the product to be purchased.
+
+2. The second message asks how many units of the product the user would like to purchase.
+
+The bamazon customer can purchase a product.:
 ![alt text][bamazonCustomer]
 
 [bamazonCustomer]: ./assets/images/bamazonCustomer.gif "bamazonCustomer Module Flow"
