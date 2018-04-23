@@ -14,7 +14,7 @@ const PRICE_DECIMAL = 2;
 
 var mysql = require("mysql");
 var inquirer = require("inquirer");
-var colors = require("colors");
+require("colors");
 
 var connection = mysql.createConnection({
 	host: "localhost",
@@ -77,13 +77,10 @@ var connection = mysql.createConnection({
 	// displayItems() shows all the items, including ids, names, and prices of products for sale
 	//
 	function displayItems() {
-		var query;
-	
 		console.log("ITEM ID".padStart(PAD_ITEM_ID).bold.yellow +
 			"   PRODUCT NAME  ".padStart(PAD_PRODUCT_NAME).bold.yellow + 
 			"        PRICE  ".padStart(PAD_PRICE).bold.yellow );
 		console.log("=======================================================".bold.blue);
-		query = 
 		connection.query("SELECT item_id, product_name, price FROM products", function(err, res) {
 			if (err) throw err;
 	
@@ -199,7 +196,7 @@ var connection = mysql.createConnection({
 					if (answer.qty > 0) {
 						msgText += "*  You have purchased " + answer.qty + " " +
 								product.productName + "(s).\n";
-						msgText += "*  Purchase total: $" + (answer.qty * product.productPrice) + ".\n";
+						msgText += "*  Purchase total: $" + (answer.qty * product.productPrice).toFixed(PRICE_DECIMAL).toString() + ".\n";
 					} else {
 						msgText += "* You decided to purchase 0 " + product.productName + "s. Continuing with bamazon...\n";
 					}
