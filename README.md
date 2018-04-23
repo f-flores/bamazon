@@ -3,7 +3,7 @@
 ## Description
 
 This terminal based app
-bamazon is a command line application which uses nodejs. It is an amazon-like store front. The app leverages MySQL to keep track of purchase orders and inventory and produces reports for would be managers and supervisors of this virtual store.
+bamazon is a command line application which uses nodejs. It is an amazon-like store front. A customer can purchase a product by using `bamazonCustomer.js`. The app leverages MySQL to keep track of purchase orders and inventory and produces reports for would be managers and supervisors of this virtual store.
 
 The `bamazon_db` database consists of two tables, `products` and  `departments`. The ``products table has the following columns:
 
